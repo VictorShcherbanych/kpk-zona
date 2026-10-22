@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="КПК">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>КПК Сталкерки</title>
+<meta name="theme-color" content="#0a0f0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=IBM+Plex+Sans:wght@400;500;600&family=Russo+One&display=swap">
+<style>
+/* Layout: one-column handheld PDA screen — bezel header, tab strip, stacked panels; SMS toasts drop from the top. Single dark look by design. */
+:root{
+  --bg:#0a0f0b; --screen:#111a13; --screen2:#17241a; --line:#2f4232; --line2:#4d6a4c;
+  --text:#dfe6d5; --muted:#93a28a; --green:#a9d38a; --amber:#e3c06e; --red:#d98a78; --rose:#e7a7a0;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Russo One","IBM Plex Sans",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1b2a1c 0,var(--bg) 60%) fixed,var(--bg);color:var(--text);font-family:var(--body);font-size:15px;-webkit-tap-highlight-color:transparent}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 2px,#00000022 2px 3px);z-index:50}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.shell{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:12px 40px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:8px 14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.sigil{width:46px;height:46px;flex:none;border:1px solid var(--line2);border-radius:8px;display:grid;place-items:center;color:var(--green);font-size:24px;background:var(--screen2);user-select:none}
+.eyebrow,.tiny{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.eyebrow{color:var(--green)}
+h1{font-family:var(--display);font-weight:400;font-size:19px;letter-spacing:.06em;margin:3px 0 0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:18px;letter-spacing:.04em;margin:0;text-wrap:balance}
+h3{font-size:14px;margin:0;color:var(--green);font-weight:600}
+.status{font-family:var(--mono);font-size:10px;letter-spacing:.08em;border:1px solid var(--line2);border-radius:4px;padding:6px 8px;white-space:nowrap;color:var(--amber)}
+.status.on{color:var(--green)}
+.subline{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tab{background:#0e150f;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:11px 4px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;position:relative}
+.tab.active{background:#203222;color:var(--green);border-color:var(--line2)}
+.tab .dot{position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.card{background:linear-gradient(160deg,var(--screen2),var(--screen));border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.message{white-space:pre-line;line-height:1.6;margin:0}
+.muted{color:var(--muted)} .small{font-size:13px;line-height:1.5}
+.terminal{font-family:var(--mono);color:var(--green);font-size:12px;line-height:1.7;margin:0;white-space:pre-wrap;font-variant-numeric:tabular-nums}
+.notice{border-left:3px solid var(--amber);padding:10px 12px;background:#241f12;color:#ecdcaa;font-size:14px;line-height:1.55;white-space:pre-line}
+.success{border-left:3px solid var(--green);padding:10px 12px;background:#18261a;line-height:1.55;font-size:14px}
+.error{border-left:3px solid var(--red);padding:10px 12px;background:#2a1916;color:#f0b8ad;font-size:13px}
+.label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.code-row{display:flex;gap:8px}
+.code-row input{flex:1;min-width:0;background:#070b08;border:1px solid var(--line2);border-radius:6px;padding:12px;text-align:center;letter-spacing:.22em;font-size:20px;font-family:var(--mono);color:var(--green);font-variant-numeric:tabular-nums}
+.code-row input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px #a9d38a22}
+.code-row input:disabled{opacity:.45}
+.btn{border:1px solid #67845a;background:#284027;color:#eef7e6;border-radius:6px;padding:11px 14px;font-family:var(--mono);font-weight:800;font-size:12px;letter-spacing:.06em}
+.btn:active{transform:translateY(1px)} .btn:disabled{opacity:.4}
+.btn.ghost{background:#0f1710;border-color:var(--line);color:var(--text)}
+.btn.warn{border-color:#7a5146;background:#33201b;color:#f1c0b4}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>.btn{flex:1 1 140px}
+.task{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:12px;background:#0d140e}
+.task.locked{opacity:.45}
+.num{min-width:36px;height:36px;border:1px solid var(--line2);border-radius:6px;display:grid;place-items:center;color:var(--green);font-family:var(--mono);font-weight:800;font-variant-numeric:tabular-nums}
+.task-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.task-body p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.pills{display:flex;flex-wrap:wrap;gap:4px}
+.pill{border:1px solid var(--line);border-radius:99px;padding:3px 8px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.pill.done{border-color:#5d7c4c;color:var(--green)} .pill.lock{border-color:#62473e;color:#d6a194} .pill.gold{border-color:#7b6a3d;color:var(--amber)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{border:1px solid var(--line);background:#0d140e;border-radius:8px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:5px}
+.mode strong{color:var(--green);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.mode span{font-size:12px;color:var(--muted);line-height:1.4}
+.mode.selected{border-color:var(--green);background:#1e2f1f}
+pre.key{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--green);background:#070b08;border:1px solid var(--line);border-radius:6px;padding:12px;margin:0;overflow-x:auto;white-space:pre;font-variant-numeric:tabular-nums}
+details summary{cursor:pointer;color:var(--green);font-family:var(--mono);font-size:12px;font-weight:800;letter-spacing:.05em;padding:4px 0}
+.inbox{display:flex;flex-direction:column;gap:8px}
+.sms{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#0d140e;display:flex;flex-direction:column;gap:4px}
+.sms .from{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--green);font-variant-numeric:tabular-nums}
+.sms p{margin:0;font-size:14px;line-height:1.5;white-space:pre-line}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translate(-50%,-140%);width:min(440px,calc(100% - 32px));background:#132015;border:1px solid var(--green);border-radius:10px;padding:12px 14px;box-shadow:0 16px 40px #000a;z-index:60;transition:transform .35s cubic-bezier(.2,.9,.3,1.2);display:flex;gap:12px;align-items:flex-start}
+.toast.show{transform:translate(-50%,0)}
+.toast .ico{font-size:20px;color:var(--green);line-height:1}
+.toast .tt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--green)}
+.toast p{margin:3px 0 0;font-size:13px;line-height:1.45}
+.letter{border:1px solid #6b4a46;background:linear-gradient(170deg,#241615,#160f0f);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.letter .tiny{color:var(--rose)}
+.letter h2{color:var(--rose)}
+.letter p{margin:0;line-height:1.7;font-size:16px;white-space:pre-line}
+.footer{text-align:center;color:#62705d;font-family:var(--mono);font-size:10px;letter-spacing:.12em}
+.op{border-color:#7b6a3d}
+.op table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.op td{border-bottom:1px solid var(--line);padding:7px 4px;vertical-align:top}
+.op td:last-child{color:var(--amber);text-align:right;white-space:nowrap}
+@keyframes blink{50%{opacity:.25}} .blink{animation:blink 1.2s steps(1) infinite}
+@media (max-width:440px){.modes{grid-template-columns:1fr}h1{font-size:16px}.status{font-size:9px;padding:5px 6px}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}.blink{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <div class="sigil" id="sigil" aria-hidden="true">☢</div>
+      <div><div class="eyebrow">Зона // персональний термінал</div><h1>КПК сталкерки</h1></div>
+    </div>
+    <div class="status" id="status">ЗАБЛОКОВАНО</div>
+  </header>
+  <div class="subline"><span id="clock">--:--:--</span><span>ЗВ'ЯЗОК: <span class="blink">●</span> СТАБІЛЬНИЙ</span></div>
+  <nav class="tabs" id="tabs" hidden>
+    <button class="tab" data-tab="journal" id="tab-journal">Журнал</button>
+    <button class="tab" data-tab="route" id="tab-route">Завдання</button>
+    <button class="tab" data-tab="stash" id="tab-stash">Сховище</button>
+  </nav>
+  <main id="view" style="display:flex;flex-direction:column;gap:14px"></main>
+  <div class="footer">PDA OS // BUILD 1.0 // НЕ ДОВІРЯЙ ТИШІ ЗОНИ</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"><div class="ico">✉</div><div><div class="tt" id="toastTitle">ВХІДНЕ ПОВІДОМЛЕННЯ</div><p id="toastText"></p></div></div>
+
+<script>
+/* ===================== ЗМІСТ ГРИ ===================== */
+const CFG = {
+  pin: "261986",
+  pinTitle: "ЗАВДАННЯ 01 — ВІДНОВЛЕННЯ ДОСТУПУ",
+  pinMessage: "КПК заблоковано. Для відновлення системи необхідно розшифрувати код доступу.\n\nПідказка зашифрована в історії Зони. Не поспішай — уважно проаналізуй дані та введи правильну комбінацію.\n\nПісля відновлення доступу буде відкрито основне завдання. Саме заради нього й розпочато цю операцію.",
+  pinClue: "Архів Зони зберігає дату, яку знає кожен сталкер: день аварії на ЧАЕС і рік, що змінив історію. Візьми день і рік, прибери місяць та склади шість цифр підряд.",
+  pinSuccess: "СИСТЕМА ВІДНОВЛЕНА.\nДоступ підтверджено.\nВітаємо в Зоні, сталкерко.\n\nТепер починається дещо важливіше…",
+  pinNotification: "Доступ до КПК відновлено. Сталкерко, першу нагороду вже знайдено.\n\nПозаду тебе знаходиться пакунок. Усередині — невеликий артефакт, здатний відновити сили перед подальшим проходженням Зони.\n\nЗабери свою знахідку. Вона тобі ще знадобиться.",
+  pinReward: "Солодкий артефакт",
+  pinRewardDesc: "Невеликий запас енергії для подальшого проходження Зони. Витратити негайно або зберегти на потім — вирішуєш сама.",
+  fieldIntro: "Повідом оператору, що обираєш польове дослідження. Оператор доставить тебе до точки, пов'язаної з цим завданням.\n\nНа місці уважно досліди оточення і скажи оператору, що, на твою думку, приховано в схроні. Якщо здогадка влучна, оператор передасть тобі польовий код.",
+  tasks: [
+    { id:2, title:"ЗАВДАННЯ 02 — СИГНАЛИ З ВЕЛИКОЇ ЗЕМЛІ", self:"5722", field:"9524", reward:"Засекречений артефакт №02",
+      clue:"КПК перехопив дивні повідомлення невідомого походження. Джерело передачі, схоже, належить до так званої Великої землі. У кожному фрагменті бракує цифр. Віднови їх у правильному порядку.\n\nФРАГМЕНТ 1 // ПАМ'ЯТЬ СИСТЕМИ\n«After _ years on the East Coast, it's time to go home.»\n\nФРАГМЕНТ 2 // КУЛЬТУРНИЙ ШУМ\nПеред тобою — дискографія гурту, що став голосом цілого покоління. Назви альбомів втратили голосні літери:\n\n2 CL 4 SKL\nSKL LV FFR\nDRK & WLD\nWNGS\nLV YRSLF: TR\nMP F TH SL: 7\nPRF\nRRNG\n\nАрхівна примітка: GOLDEN — Jung Kook. Один з учасників має окремий реліз, назва якого нагадує про дорогоцінний метал.\nСкільки їх у гурті?\n\nФРАГМЕНТ 3 // ОСОБЛИВИЙ ВЕЧІР\nУ пам'яті системи виявлено запис про один особливий вечір. Легка хвороба. Холод надворі, слякоть під ногами. Затишний простір, ковток пива й розмови, які непомітно переходять від буденних речей до вічного. Двоє гарних людей. Вечір, який хочеться зберегти в пам'яті.\n\nЗапит системи: якою датою (число) позначено цей спогад? Дві цифри. Іноді найцінніші координати — це дати, які пам'ятаєш не лише ти.\n\nЗбери три фрагменти в один чотиризначний код." },
+    { id:3, title:"ЗАВДАННЯ 03 — СЛІД ПЕРШОГО ДОСВІДУ", self:"28191519", field:"1243", reward:"Засекречений артефакт №03", alphabet:true,
+      clue:"У пам'яті системи зберігся запис про місце, де одна історія тільки починалася.\n\nТоді ще не все виходило ідеально. Руки лише звикали до нової справи, а кожне замовлення ставало маленьким випробуванням. Це був період перших спроб, нових навичок і знайомства з ремеслом, яке згодом стало частиною твого досвіду.\n\nЧас минув, але назва цього об'єкта залишилася в архіві.\n\nЗавдання: встанови назву закладу, де розпочався цей етап твого шляху.\n\nВідкрий алфавітний ключ КПК. Кожна літера назви має своє число в таблиці. Заміни кожну літеру її числом і введи всі числа поспіль, без пробілів." },
+    { id:4, title:"ЗАВДАННЯ 04 — КООРДИНАТИ ІСТОРІЇ", self:"012026", field:"2007", reward:"Фінальний артефакт",
+      clue:"РІВЕНЬ ДОСТУПУ: ФІНАЛЬНИЙ\n\nУ пам'яті КПК виявлено архівний запис про рідкісний артефакт.\n\nКолись він з'явився ще до початку вашої спільної подорожі. Звичайний на вигляд, але важливий за своїм значенням. Саме з таких маленьких моментів іноді починається щось велике.\n\nСьогодні система фіксує іншу дату — не момент появи артефакту, а точку, до якої ви змогли дійти разом.\n\nЗавдання: віднови координати цього моменту.\n\nМісяць — дві цифри. Рік — чотири цифри. Введи обидва фрагменти підряд, без пробілів і розділових знаків.\n\nОстання підказка: іноді важливіше не пам'ятати, коли все почалося, а усвідомлювати, як далеко ви вже зайшли разом." }
+  ],
+  alphabet:" А  Б  В  Г  Ґ  Д  Е  Є  Ж  З  И\n01 02 03 04 05 06 07 08 09 10 11\n\n І  Ї  Й  К  Л  М  Н  О  П  Р  С\n12 13 14 15 16 17 18 19 20 21 22\n\n Т  У  Ф  Х  Ц  Ч  Ш  Щ  Ь  Ю  Я\n23 24 25 26 27 28 29 30 31 32 33",
+  finalLetter:"Усі артефакти знайдено.\n\nА якщо серйозно — 22 жовтня з одного поцілунку почалася наша історія. Я хотів, щоб сьогодні ти ще раз відчула, наскільки ти для мене особлива.\n\nДякую, що пройшла цю Зону зі мною. І всі наступні — теж разом. ❤️"
+};
+
+/* ===================== СТАН ===================== */
+const KEY="kpk_zona_state_v1";
+const fresh=()=>({unlocked:false,tab:"journal",open:null,mode:{},solved:{},bonus:{},rewards:[],inbox:[],final:false,unread:false});
+let S; try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const task=id=>CFG.tasks.find(t=>t.id===id);
+const unlockedTask=id=>id===2?S.unlocked:done(id-1);
+const solved=(id,m)=>!!(S.solved[id]&&S.solved[id][m]);
+const done=id=>solved(id,"self")||solved(id,"field");
+const pad=n=>String(n).padStart(2,"0");
+const now=()=>{const d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes())};
+
+/* ===================== ЗВУК КПК ===================== */
+let AC=null;
+function audio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}return AC}
+document.addEventListener("pointerdown",audio,{once:true});
+function tone(ac,t,f,d,type,vol){const o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();o.type=type;o.frequency.setValueAtTime(f,t);lp.type="lowpass";lp.frequency.value=3200;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(lp).connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02)}
+function crackle(ac,t,d){const n=Math.floor(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),ch=b.getChannelData(0);for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*(1-i/n)*.5;const s=ac.createBufferSource(),g=ac.createGain(),hp=ac.createBiquadFilter();hp.type="highpass";hp.frequency.value=1800;g.gain.value=.12;s.buffer=b;s.connect(hp).connect(g).connect(ac.destination);s.start(t)}
+/* Оригінальний звук КПК (2-pda-sound.mp3), декодується після першого дотику */
+const SMS_MP3="data:audio/mpeg;base64,SUQzBAAAAAABAFRYWFgAAAASAAADbWFqb3JfYnJhbmQAM2dwNQBUWFhYAAAAEQAAA21pbm9yX3ZlcnNpb24AMABUWFhYAAAAHAAAA2NvbXBhdGlibGVfYnJhbmRzADNncDVpc29tAFRTU0UAAAAPAAADTGF2ZjU3LjgzLjEwMAAAAAAAAAAAAAAA//tUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAA5AABWQAAGCwsPDxQUGBwcISElJSouLjMzNzc8QEBFRUlJTVJSVlZbW19kZGhobW1xdXV6en5+g4eHjIyQkJWZmZ6eoqKmq6uvr7S0uL29wcHGxsrPz9PT19fc4ODl5enp7vLy9/f7+/8AAAAATGF2YzU3LjEwAAAAAAAAAAAAAAAAJAaRAAAAAAAAVkCo7Zap//uUZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV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4nb5xY0Y2AmpNSjM0NVUtVhq//uURPMGctlcQEBhH4Bci7f1DCNACsWA6QGIeAlZK56AEIwBJJVUK1+NS+kzMxxfjHt1elVX6XVVSKcNSY+Bj2YMKhw7GP2qkpamVCrqVal8a+3GZm/+N+al/VJSUsKJAFqgwNHI1a2WWWWo5GrBQQIOjkatbLLLLUcjVgpRRcXmzTuzs7OUWWZalokjQIo8y43Kf+ak404DAzCakkSQKKAhZlxuU/81JxooDAxBNBaJIFFAR5lxeV/uVJxooDAxBNBaJIFFAR5lxeb2vKk40UBgYgmgtEkCigIsx6VMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uURLyPQAAAaQAAAAhZDEeFDCNwAAABpAAAACHzMFSIMZl5VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uUZFGP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
+let smsBuf=null,smsLoading=false;
+function loadSms(){const ac=audio();if(!ac||smsBuf||smsLoading)return;smsLoading=true;try{const bin=atob(SMS_MP3.split(",")[1]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);ac.decodeAudioData(u.buffer,b=>{smsBuf=b},()=>{smsLoading=false})}catch(e){smsLoading=false}}
+document.addEventListener("pointerdown",loadSms,{once:true});
+function smsSound(){const ac=audio();if(!ac)return;try{navigator.vibrate&&navigator.vibrate([60,60,90])}catch(e){}if(smsBuf){const s=ac.createBufferSource(),g=ac.createGain();g.gain.value=.9;s.buffer=smsBuf;s.connect(g).connect(ac.destination);s.start();return}loadSms();synthSms(ac)}
+function synthSms(ac){const t=ac.currentTime+.03;crackle(ac,t,.05);tone(ac,t+.05,1320,.09,"square",.09);tone(ac,t+.16,1760,.14,"square",.09);tone(ac,t+.16,880,.14,"triangle",.06)}
+function errSound(){const ac=audio();if(!ac)return;const t=ac.currentTime+.02;tone(ac,t,220,.18,"sawtooth",.06);tone(ac,t+.2,180,.22,"sawtooth",.06)}
+
+/* ===================== ПОВІДОМЛЕННЯ ===================== */
+let toastTimer;
+function sms(text,from="ОПЕРАТОР",silent=false){
+  S.inbox.unshift({from,text,time:now()}); if(S.tab!=="journal")S.unread=true; save();
+  $("toastTitle").textContent="ВХІДНЕ ПОВІДОМЛЕННЯ // "+from; $("toastText").textContent=text.split("\n")[0];
+  const t=$("toast"); t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),4200);
+  if(!silent)smsSound();
+}
+$("toast").addEventListener("click",()=>{$("toast").classList.remove("show");go("journal")});
+
+/* ===================== ЕКРАНИ ===================== */
+function go(tab){S.tab=tab;S.open=null;if(tab==="journal")S.unread=false;save();render();window.scrollTo(0,0)}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+
+function render(){
+  const st=$("status"); st.textContent=S.final?"ОПЕРАЦІЮ ЗАВЕРШЕНО":S.unlocked?"СИСТЕМА АКТИВНА":"ЗАБЛОКОВАНО"; st.classList.toggle("on",S.unlocked);
+  $("tabs").hidden=!S.unlocked;
+  document.querySelectorAll(".tab").forEach(b=>{b.classList.toggle("active",b.dataset.tab===S.tab);const d=b.querySelector(".dot");if(d)d.remove();if(b.dataset.tab==="journal"&&S.unread)b.insertAdjacentHTML("beforeend",'<span class="dot"></span>')});
+  const v=$("view");
+  if(opMode){v.innerHTML=renderOperator();bindOperator();return}
+  if(!S.unlocked){v.innerHTML=renderPin();bindPin();return}
+  if(S.tab==="route"&&S.open){v.innerHTML=renderTask(task(S.open));bindTask(task(S.open));return}
+  v.innerHTML=S.tab==="route"?renderRoute():S.tab==="stash"?renderStash():renderJournal();
+}
+
+function renderPin(){return `
+<section class="card">
+  <div class="tiny">Вхідний сигнал // зашифровано</div>
+  <h2>${esc(CFG.pinTitle)}</h2>
+  <p class="message">${esc(CFG.pinMessage)}</p>
+  <div class="notice">${esc(CFG.pinClue)}</div>
+  <label class="label" for="pinInput">Код доступу // 6 цифр</label>
+  <div class="code-row"><input id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••••"><button class="btn" id="pinBtn">РОЗШИФРУВАТИ</button></div>
+  <div id="pinFb"></div>
+</section>
+<section class="card"><div class="tiny">Стан термінала</div><p class="terminal">AUTH: DENIED
+DATA CORE: ENCRYPTED
+OPERATOR: UNKNOWN
+WAITING FOR ACCESS CODE<span class="blink">_</span></p></section>`}
+function bindPin(){const i=$("pinInput"),go2=()=>{audio();if(i.value.replace(/\D/g,"")===CFG.pin){S.unlocked=true;S.tab="journal";save();render();setTimeout(()=>sms(CFG.pinNotification),350)}else{errSound();$("pinFb").innerHTML='<div class="error">КОД НЕ ПІДТВЕРДЖЕНО. Перевір підказку та спробуй ще раз.</div>';i.value="";i.focus()}};$("pinBtn").onclick=go2;i.onkeydown=e=>{if(e.key==="Enter")go2()}}
+
+function renderJournal(){
+  const n=[2,3,4].filter(done).length;
+  const inbox=S.inbox.map(m=>`<div class="sms"><div class="from"><span>✉ ${esc(m.from)}</span><span>${esc(m.time)}</span></div><p>${esc(m.text)}</p></div>`).join("");
+  return `
+${S.final?renderLetter():""}
+<section class="card">
+  <div class="tiny">Вхідне повідомлення // оператор</div>
+  <p class="message">${esc(CFG.pinSuccess)}</p>
+  <p class="terminal">ДОСТУП ДО КПК: ПІДТВЕРДЖЕНО
+ОСНОВНЕ ЗАВДАННЯ: ${S.final?"ВИКОНАНО":"АКТИВНЕ"}
+ВИКОНАНО ЗАВДАНЬ: ${n}/3</p>
+  <div class="row"><button class="btn" onclick="go('route')">ВІДКРИТИ ЗАВДАННЯ</button><button class="btn ghost" onclick="go('stash')">ОСОБИСТЕ СХОВИЩЕ</button></div>
+</section>
+<section class="card"><div class="tiny">Отримані повідомлення</div><div class="inbox">${inbox||'<p class="muted small">Повідомлень немає.</p>'}</div></section>`}
+
+function renderLetter(){
+  const left=[2,3,4].flatMap(id=>["self","field"].filter(m=>!solved(id,m)).map(m=>`Завдання ${pad(id)} — ${m==="self"?"самостійне":"польове"} дослідження`));
+  const extra=left.length?`<div class="notice"><b>ЗОНА ЩЕ НЕ ДОСЛІДЖЕНА ДО КІНЦЯ.</b>\nОсновну операцію завершено, але деякі маршрути залишилися непройденими. За кожне завдання, пройдене обома шляхами, на тебе чекає додаткова засекречена нагорода.\n\nДоступні додаткові квести:\n${left.map(s=>"◈ "+s).join("\n")}</div><div class="row"><button class="btn" onclick="go('route')">ДОПРОЙТИ ДОДАТКОВІ КВЕСТИ</button></div>`:"";
+  return `<section class="letter"><div class="tiny">Повідомлення не від оператора</div><h2>Операцію завершено</h2><p>${esc(CFG.finalLetter)}</p></section>${extra}`}
+
+function renderRoute(){
+  const list=[2,3,4].map(id=>{const t=task(id),un=unlockedTask(id),d=done(id);return `
+  <div class="task ${un?"":"locked"}"><div class="num">${pad(id)}</div><div class="task-body">
+    <h3>${esc(t.title)}</h3>
+    <p>${un?(d?"Основне завдання пройдено. Альтернативний маршрут ще може приховувати знахідки.":"Дані доступні для дослідження."):"ДАНІ ЗАБЛОКОВАНО — виконай попереднє завдання."}</p>
+    <div class="pills">${d?'<span class="pill done">ВИКОНАНО</span>':un?'<span class="pill">ДОСТУП ВІДКРИТО</span>':'<span class="pill lock">ЗАБЛОКОВАНО</span>'}${solved(id,"self")?'<span class="pill done">САМОСТІЙНЕ ✓</span>':''}${solved(id,"field")?'<span class="pill done">ПОЛЬОВЕ ✓</span>':''}${S.bonus[id]?'<span class="pill gold">БОНУС ◆</span>':''}</div>
+    ${un?`<button class="btn ghost" onclick="openTask(${id})">${d?"ПРОДОВЖИТИ ДОСЛІДЖЕННЯ":"ВІДКРИТИ ЗАВДАННЯ"}</button>`:""}
+  </div></div>`}).join("");
+  return `<section class="card"><div class="tiny">Маршрут операції</div><h2>Журнал завдань</h2>
+  <p class="muted small">Кожне завдання має два незалежні шляхи: самостійне дослідження та польове. Для переходу далі достатньо одного. Хто пройде обидва — отримає додаткову засекречену нагороду.</p>${list}</section>`}
+
+function openTask(id){S.tab="route";S.open=id;S.mode[id]=S.mode[id]||"self";save();render();window.scrollTo(0,0)}
+function setMode(id,m){S.mode[id]=m;save();render()}
+
+function renderTask(t){
+  const m=S.mode[t.id]||"self",d=solved(t.id,m),both=solved(t.id,"self")&&solved(t.id,"field"),len=(m==="self"?t.self:t.field).length;
+  return `<section class="card">
+  <div><button class="btn ghost" onclick="go('route')">← ДО СПИСКУ</button></div>
+  <div class="tiny">Активна місія // ${pad(t.id)}</div><h2>${esc(t.title)}</h2>
+  <div class="modes">
+    <button class="mode ${m==="self"?"selected":""}" onclick="setMode(${t.id},'self')"><strong>◈ САМОСТІЙНЕ ДОСЛІДЖЕННЯ</strong><span>Розгадай дані КПК без виїзду на локацію.</span>${solved(t.id,"self")?'<span class="pill done" style="align-self:flex-start">ВИКОНАНО ✓</span>':''}</button>
+    <button class="mode ${m==="field"?"selected":""}" onclick="setMode(${t.id},'field')"><strong>⌖ ПОЛЬОВЕ ДОСЛІДЖЕННЯ</strong><span>Виїзд на точку та здогадка на місці.</span>${solved(t.id,"field")?'<span class="pill done" style="align-self:flex-start">ВИКОНАНО ✓</span>':''}</button>
+  </div>
+  <div class="tiny">${m==="self"?"Декодування локальних даних":"Польовий канал // дані оператора"}</div>
+  <p class="message">${esc(m==="self"?t.clue:CFG.fieldIntro)}</p>
+  ${t.alphabet&&m==="self"?`<details open><summary>Алфавітний ключ КПК</summary><pre class="key">${esc(CFG.alphabet)}</pre></details>`:""}
+  <label class="label" for="ans">Код відповіді // ${len} цифр підряд</label>
+  <div class="code-row"><input id="ans" inputmode="numeric" maxlength="${len}" autocomplete="off" placeholder="${"•".repeat(len)}" ${d?"disabled":""}><button class="btn" id="ansBtn" ${d?"disabled":""}>ПІДТВЕРДИТИ</button></div>
+  <div id="ansFb">${d?'<div class="success">Цей шлях уже пройдено. Можеш дослідити альтернативний маршрут.</div>':""}</div>
+  ${done(t.id)?`<div class="success"><b>ОСНОВНЕ ЗАВДАННЯ ВИКОНАНО.</b><br>Нагороду зареєстровано в особистому сховищі. Тип артефакту засекречено до завершення операції.<br><br>${both?"<b>БОНУС РОЗБЛОКОВАНО:</b> ти дослідила аномалію з обох боків. Додаткову нагороду зареєстровано окремо.":"Другий маршрут усе ще доступний. Пройди обидва, щоб відкрити додаткову нагороду."}</div>`:`<div class="notice">Тип знахідки приховано. Після правильної відповіді артефакт буде внесено до особистого сховища. Фізичне місце зберігання не розкривається.</div>`}
+  </section>`}
+function bindTask(t){
+  const i=$("ans"),b=$("ansBtn");if(!i||i.disabled)return;
+  const submit=()=>{audio();const m=S.mode[t.id]||"self",exp=m==="self"?t.self:t.field;
+    if(i.value.replace(/\D/g,"")===exp){
+      const wasDone=done(t.id);
+      S.solved[t.id]=S.solved[t.id]||{};S.solved[t.id][m]=true;
+      if(!S.rewards.some(r=>r.name===t.reward))S.rewards.push({name:t.reward,desc:"Основна нагорода зареєстрована. Фізичне місце зберігання засекречено."});
+      let msg="КОД ПІДТВЕРДЖЕНО. "+t.title.split(" — ")[0]+" виконано.\nВинагороду зареєстровано. Тип знахідки: засекречено.";
+      if(solved(t.id,"self")&&solved(t.id,"field")&&!S.bonus[t.id]){S.bonus[t.id]=true;S.rewards.push({name:"Додатковий артефакт // завдання "+pad(t.id),desc:"Секретний бонус за проходження обох маршрутів. Вміст засекречено."});msg="ВИЯВЛЕНО ДОДАТКОВУ ВИНАГОРОДУ.\nСталкерко, ти дослідила аномалію з обох боків. Така наполегливість заслуговує на особливу відзнаку. Вміст засекречено."}
+      else if(wasDone)msg="КОД ПІДТВЕРДЖЕНО. Альтернативний маршрут пройдено.";
+      else if(t.id<4)msg+="\nДоступ до наступного завдання відкрито.";
+      const finishing=t.id===4&&!S.final;
+      if(finishing){S.final=true;S.rewards.push({name:"Доступ до фінального сховища",desc:"Усі основні завдання виконано. Час забрати свої знахідки."})}
+      save();render();
+      if(finishing){sms("ОПЕРАЦІЮ ЗАВЕРШЕНО.\nУсі артефакти знайдено. Відкрий журнал — на тебе чекає ще одне повідомлення.");setTimeout(()=>{S.tab="journal";S.open=null;S.unread=false;save();render();window.scrollTo(0,0)},2600)}
+      else sms(msg);
+    }else{errSound();$("ansFb").innerHTML='<div class="error">КОД НЕ ПІДТВЕРДЖЕНО. Перевір фрагменти та спробуй ще раз.</div>';i.select()}};
+  b.onclick=submit;i.onkeydown=e=>{if(e.key==="Enter")submit()};
+}
+
+function renderStash(){
+  const items=[`<div class="task"><div class="num">01</div><div class="task-body"><h3>${esc(CFG.pinReward)}</h3><p>${esc(CFG.pinRewardDesc)}</p><div class="pills"><span class="pill done">ЗНАЙДЕНО</span></div></div></div>`]
+    .concat(S.rewards.map(r=>`<div class="task"><div class="num">◆</div><div class="task-body"><h3>${esc(r.name)}</h3><p>${esc(r.desc)}</p><div class="pills"><span class="pill done">ЗАРЕЄСТРОВАНО</span></div></div></div>`)).join("");
+  return `<section class="card"><div class="tiny">Особисте сховище // локальний реєстр</div><h2>Зібрані артефакти</h2>
+  <p class="muted small">Система приховує справжні назви знахідок до завершення операції. КПК не вказує, де саме фізично зберігаються предмети.</p>${items}
+  ${S.final?'<div class="success"><b>ОПЕРАЦІЮ ЗАВЕРШЕНО.</b><br>Система більше не приховує доступ до фінального сховища. Час забрати свої знахідки, сталкерко.</div>':""}</section>`}
+
+/* ===================== РЕЖИМ ОПЕРАТОРА (тільки для тебе) =====================
+   Відкрити: 5 разів швидко тапнути по ☢ або додати #operator в кінець адреси. */
+let opMode=location.hash==="#operator",taps=0,tapT;
+$("sigil").addEventListener("click",()=>{taps++;clearTimeout(tapT);tapT=setTimeout(()=>taps=0,1500);if(taps>=5){taps=0;opMode=!opMode;render()}});
+let resetArmed=false;
+function renderOperator(){
+  const rows=[["Завдання 01 — PIN",CFG.pin]].concat(CFG.tasks.flatMap(t=>[[pad(t.id)+" самостійне",t.self],[pad(t.id)+" польове",t.field]]));
+  return `<section class="card op"><div class="tiny">Режим оператора // не показувати сталкерці</div><h2>Шпаргалка кодів</h2>
+  <table>${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</table>
+  <p class="terminal">ПРОГРЕС: ${S.unlocked?"розблоковано":"заблоковано"} · виконано ${[2,3,4].filter(done).length}/3 · бонусів ${Object.keys(S.bonus).length}</p>
+  <div class="row"><button class="btn ghost" id="testSnd">ПЕРЕВІРИТИ ЗВУК</button><button class="btn warn" id="reset">${resetArmed?"ТОЧНО? НАТИСНИ ЩЕ РАЗ":"СКИНУТИ ПРОГРЕС"}</button></div>
+  <button class="btn" id="opExit">ВИЙТИ З РЕЖИМУ ОПЕРАТОРА</button></section>`}
+function bindOperator(){
+  $("testSnd").onclick=()=>smsSound();
+  $("reset").onclick=()=>{if(!resetArmed){resetArmed=true;render();return}resetArmed=false;S=fresh();save();render()};
+  $("opExit").onclick=()=>{opMode=false;resetArmed=false;if(location.hash==="#operator")history.replaceState(null,"",location.pathname+location.search);render()};
+}
+
+window.go=go;window.openTask=openTask;window.setMode=setMode;
+setInterval(()=>{const d=new Date();$("clock").textContent=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())+" // "+pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear()},1000);
+render();
+</script>
+
+</body>
+</html>
