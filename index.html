@@ -93,6 +93,10 @@ details summary{cursor:pointer;color:var(--green);font-family:var(--mono);font-s
 .letter .tiny{color:var(--rose)}
 .letter h2{color:var(--rose)}
 .letter p{margin:0;line-height:1.7;font-size:16px;white-space:pre-line}
+.art{width:76px;height:76px;flex:none;object-fit:cover;border-radius:8px;border:1px solid var(--line2);background:#070b08;filter:saturate(.85) contrast(1.05)}
+.art.big{width:96px;height:96px}
+.artname{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--amber)}
+.found{display:flex;gap:12px;align-items:center;border:1px dashed #6e865d;background:#142016;border-radius:8px;padding:10px}
 .footer{text-align:center;color:#62705d;font-family:var(--mono);font-size:10px;letter-spacing:.12em}
 .op{border-color:#7b6a3d}
 .op table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
@@ -267,7 +271,7 @@ function renderTask(t){
   <label class="label" for="ans">Код відповіді // ${len} цифр підряд</label>
   <div class="code-row"><input id="ans" inputmode="numeric" maxlength="${len}" autocomplete="off" placeholder="${"•".repeat(len)}" ${d?"disabled":""}><button class="btn" id="ansBtn" ${d?"disabled":""}>ПІДТВЕРДИТИ</button></div>
   <div id="ansFb">${d?'<div class="success">Цей шлях уже пройдено. Можеш дослідити альтернативний маршрут.</div>':""}</div>
-  ${done(t.id)?`<div class="success"><b>ОСНОВНЕ ЗАВДАННЯ ВИКОНАНО.</b><br>Нагороду зареєстровано в особистому сховищі. Тип артефакту засекречено до завершення операції.<br><br>${both?"<b>БОНУС РОЗБЛОКОВАНО:</b> ти дослідила аномалію з обох боків. Додаткову нагороду зареєстровано окремо.":"Другий маршрут усе ще доступний. Пройди обидва, щоб відкрити додаткову нагороду."}</div>`:`<div class="notice">Тип знахідки приховано. Після правильної відповіді артефакт буде внесено до особистого сховища. Фізичне місце зберігання не розкривається.</div>`}
+  ${done(t.id)?`<div class="found"><img class="art big" src="${ART[t.id].img}" alt="Артефакт «${esc(ART[t.id].name)}»"><div><div class="tiny">Знахідку зареєстровано</div><div class="artname">АРТЕФАКТ «${esc(ART[t.id].name).toUpperCase()}»</div><p class="muted small" style="margin:4px 0 0">${esc(ART[t.id].note)}</p></div></div><div class="success"><b>ОСНОВНЕ ЗАВДАННЯ ВИКОНАНО.</b><br>Нагороду зареєстровано в особистому сховищі. Тип артефакту засекречено до завершення операції.<br><br>${both?"<b>БОНУС РОЗБЛОКОВАНО:</b> ти дослідила аномалію з обох боків. Додаткову нагороду зареєстровано окремо.":"Другий маршрут усе ще доступний. Пройди обидва, щоб відкрити додаткову нагороду."}</div>`:`<div class="notice">Тип знахідки приховано. Після правильної відповіді артефакт буде внесено до особистого сховища. Фізичне місце зберігання не розкривається.</div>`}
   </section>`}
 function bindTask(t){
   const i=$("ans"),b=$("ansBtn");if(!i||i.disabled)return;
@@ -289,9 +293,20 @@ function bindTask(t){
   b.onclick=submit;i.onkeydown=e=>{if(e.key==="Enter")submit()};
 }
 
+/* Фото артефактів зі S.T.A.L.K.E.R. під кожну нагороду */
+const ART={
+  pin:{img:"img/jellyfish.jpg",name:"Медуза",note:"Слабко світиться в темряві. Відновлює сили."},
+  2:{img:"img/goldfish.jpg",name:"Золота рибка",note:"Рідкісна знахідка з глибин Зони. Кажуть, приносить удачу."},
+  3:{img:"img/fireball.jpg",name:"Вогняна куля",note:"Тепла на дотик. Зберігає жар навіть у холодну ніч."},
+  4:{img:"img/stone-flower.jpg",name:"Кам'яна квітка",note:"Одна з найкрасивіших аномальних формацій. Трапляється вкрай рідко."},
+  bonus:{img:"img/soul.jpg",name:"Душа",note:"Невідома формація. Вміст засекречено."},
+  final:{img:"img/moonlight.jpg",name:"Місячне світло",note:"Ключ до фінального сховища."}
+};
+function artFor(name){if(name===CFG.pinReward)return ART.pin;const t=CFG.tasks.find(t=>t.reward===name);if(t)return ART[t.id];if(String(name).startsWith("Додатковий"))return ART.bonus;return ART.final}
+function artCard(a,title,desc,pill){return `<div class="task"><img class="art" src="${a.img}" alt="Артефакт «${esc(a.name)}»" loading="lazy"><div class="task-body"><h3>${esc(title)}</h3><div class="artname">АРТЕФАКТ «${esc(a.name).toUpperCase()}»</div><p>${esc(a.note)}</p><p>${esc(desc)}</p><div class="pills"><span class="pill done">${pill}</span></div></div></div>`}
 function renderStash(){
-  const items=[`<div class="task"><div class="num">01</div><div class="task-body"><h3>${esc(CFG.pinReward)}</h3><p>${esc(CFG.pinRewardDesc)}</p><div class="pills"><span class="pill done">ЗНАЙДЕНО</span></div></div></div>`]
-    .concat(S.rewards.map(r=>`<div class="task"><div class="num">◆</div><div class="task-body"><h3>${esc(r.name)}</h3><p>${esc(r.desc)}</p><div class="pills"><span class="pill done">ЗАРЕЄСТРОВАНО</span></div></div></div>`)).join("");
+  const items=[artCard(ART.pin,CFG.pinReward,CFG.pinRewardDesc,"ЗНАЙДЕНО")]
+    .concat(S.rewards.map(r=>artCard(artFor(r.name),r.name,r.desc,"ЗАРЕЄСТРОВАНО"))).join("");
   return `<section class="card"><div class="tiny">Особисте сховище // локальний реєстр</div><h2>Зібрані артефакти</h2>
   <p class="muted small">Система приховує справжні назви знахідок до завершення операції. КПК не вказує, де саме фізично зберігаються предмети.</p>${items}
   ${S.final?'<div class="success"><b>ОПЕРАЦІЮ ЗАВЕРШЕНО.</b><br>Система більше не приховує доступ до фінального сховища. Час забрати свої знахідки, сталкерко.</div>':""}</section>`}
