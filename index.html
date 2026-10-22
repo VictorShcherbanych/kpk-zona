@@ -256,8 +256,8 @@ ${renderVoice()}
   <div class="tiny">Вхідне повідомлення // оператор</div>
   <p class="message">${esc(CFG.pinSuccess)}</p>
   <p class="terminal">ДОСТУП ДО КПК: ПІДТВЕРДЖЕНО
-ОСНОВНЕ ЗАВДАННЯ: ${S.final?"ВИКОНАНО":"АКТИВНЕ"}
-ВИКОНАНО ЗАВДАНЬ: ${n}/3</p>
+ОПЕРАЦІЯ: ${S.final?"ЗАВЕРШЕНА":"ТРИВАЄ"}
+ВИКОНАНО ЗАВДАНЬ: ${n+1}/4</p>
   <div class="row"><button class="btn" onclick="go('route')">ВІДКРИТИ ЗАВДАННЯ</button><button class="btn ghost" onclick="go('stash')">ОСОБИСТЕ СХОВИЩЕ</button></div>
 </section>
 <section class="card"><div class="tiny">Отримані повідомлення</div><div class="inbox">${inbox||'<p class="muted small">Повідомлень немає.</p>'}</div></section>`}
@@ -271,12 +271,19 @@ function renderRoute(){
   const list=[2,3,4].map(id=>{const t=task(id),un=unlockedTask(id),d=done(id);return `
   <div class="task ${un?"":"locked"}"><div class="num">${pad(id)}</div><div class="task-body">
     <h3>${esc(t.title)}</h3>
-    <p>${un?(d?"Основне завдання пройдено. Альтернативний маршрут ще може приховувати знахідки.":"Дані доступні для дослідження."):"ДАНІ ЗАБЛОКОВАНО — виконай попереднє завдання."}</p>
+    <p>${un?(d?"Завдання пройдено. Альтернативний маршрут ще може приховувати знахідки.":"Дані доступні для дослідження."):"ДАНІ ЗАБЛОКОВАНО — виконай попереднє завдання."}</p>
     <div class="pills">${d?'<span class="pill done">ВИКОНАНО</span>':un?'<span class="pill">ДОСТУП ВІДКРИТО</span>':'<span class="pill lock">ЗАБЛОКОВАНО</span>'}${solved(id,"self")?'<span class="pill done">САМОСТІЙНЕ ✓</span>':''}${solved(id,"field")?'<span class="pill done">ПОЛЬОВЕ ✓</span>':''}${S.bonus[id]?'<span class="pill gold">БОНУС ◆</span>':''}</div>
     ${un?`<button class="btn ghost" onclick="openTask(${id})">${d?"ПРОДОВЖИТИ ДОСЛІДЖЕННЯ":"ВІДКРИТИ ЗАВДАННЯ"}</button>`:""}
   </div></div>`}).join("");
-  return `<section class="card"><div class="tiny">Маршрут операції</div><h2>Журнал завдань</h2>
-  <p class="muted small">Кожне завдання має два незалежні шляхи: самостійне дослідження та польове. Для переходу далі достатньо одного. Хто пройде обидва — отримає додаткову засекречену нагороду.</p>${list}</section>`}
+  const first=`<div class="task"><div class="num">01</div><div class="task-body">
+    <h3>${esc(CFG.pinTitle)}</h3>
+    <p>Код доступу розшифровано. КПК відновлено, сталкерку допущено до операції.</p>
+    <div class="pills"><span class="pill done">ВИКОНАНО</span><span class="pill done">«${esc(CFG.pinReward).toUpperCase()}» ЗНАЙДЕНО</span></div>
+  </div></div>`;
+  return `<section class="card"><div class="tiny">Маршрут операції // ${[2,3,4].filter(done).length+1}/4</div><h2>Журнал завдань</h2>
+  <p class="muted small">Кожне завдання має два незалежні шляхи: самостійне дослідження та польове. Для переходу далі достатньо одного. Хто пройде обидва — отримає додаткову засекречену нагороду.</p>${first}${list}</section>`}
+const leftCount=()=>[2,3,4].filter(id=>!done(id)).length;
+const leftText=()=>{const n=leftCount();return n===0?"Усі завдання операції виконано.":"Залишилось завдань до кінця операції: "+n+"."};
 
 function openTask(id){S.tab="route";S.open=id;S.mode[id]=S.mode[id]||"self";save();render();window.scrollTo(0,0)}
 function setMode(id,m){S.mode[id]=m;save();render()}
@@ -296,7 +303,7 @@ function renderTask(t){
   <label class="label" for="ans">Код відповіді // ${len} цифр підряд</label>
   <div class="code-row"><input id="ans" inputmode="numeric" maxlength="${len}" autocomplete="off" placeholder="${"•".repeat(len)}" ${d?"disabled":""}><button class="btn" id="ansBtn" ${d?"disabled":""}>ПІДТВЕРДИТИ</button></div>
   <div id="ansFb">${d?'<div class="success">Цей шлях уже пройдено. Можеш дослідити альтернативний маршрут.</div>':""}</div>
-  ${done(t.id)?`<div class="found"><img class="art big" src="${ART[t.id].img}" alt="Артефакт «${esc(ART[t.id].name)}»"><div><div class="tiny">Знахідку зареєстровано</div><div class="artname">АРТЕФАКТ «${esc(ART[t.id].name).toUpperCase()}»</div><p class="muted small" style="margin:4px 0 0">${esc(ART[t.id].note)}</p></div></div><div class="success"><b>ОСНОВНЕ ЗАВДАННЯ ВИКОНАНО.</b><br>Нагороду зареєстровано в особистому сховищі. Тип артефакту засекречено до завершення операції.<br><br>${both?"<b>БОНУС РОЗБЛОКОВАНО:</b> ти дослідила аномалію з обох боків. Додаткову нагороду зареєстровано окремо.":"Другий маршрут усе ще доступний. Пройди обидва, щоб відкрити додаткову нагороду."}</div>`:`<div class="notice">Тип знахідки приховано. Після правильної відповіді артефакт буде внесено до особистого сховища. Фізичне місце зберігання не розкривається.</div>`}
+  ${done(t.id)?`<div class="found"><img class="art big" src="${ART[t.id].img}" alt="Артефакт «${esc(ART[t.id].name)}»"><div><div class="tiny">Знахідку зареєстровано</div><div class="artname">АРТЕФАКТ «${esc(ART[t.id].name).toUpperCase()}»</div><p class="muted small" style="margin:4px 0 0">${esc(ART[t.id].note)}</p></div></div><div class="success"><b>${esc(t.title.split(" — ")[0])} ВИКОНАНО.</b><br>Нагороду зареєстровано в особистому сховищі. Тип артефакту засекречено до завершення операції.<br>${esc(leftText())}<br><br>${both?"<b>БОНУС РОЗБЛОКОВАНО:</b> ти дослідила аномалію з обох боків. Додаткову нагороду зареєстровано окремо.":"Другий маршрут усе ще доступний. Пройди обидва, щоб відкрити додаткову нагороду."}</div>`:`<div class="notice">Тип знахідки приховано. Після правильної відповіді артефакт буде внесено до особистого сховища. Фізичне місце зберігання не розкривається.</div>`}
   </section>`}
 function bindTask(t){
   const i=$("ans"),b=$("ansBtn");if(!i||i.disabled)return;
@@ -308,7 +315,7 @@ function bindTask(t){
       let msg="КОД ПІДТВЕРДЖЕНО. "+t.title.split(" — ")[0]+" виконано.\nВинагороду зареєстровано. Тип знахідки: засекречено.";
       if(solved(t.id,"self")&&solved(t.id,"field")&&!S.bonus[t.id]){S.bonus[t.id]=true;S.rewards.push({name:"Додатковий артефакт // завдання "+pad(t.id),desc:"Секретний бонус за проходження обох маршрутів. Вміст засекречено."});msg="ВИЯВЛЕНО ДОДАТКОВУ ВИНАГОРОДУ.\nСталкерко, ти дослідила аномалію з обох боків. Така наполегливість заслуговує на особливу відзнаку. Вміст засекречено."}
       else if(wasDone)msg="КОД ПІДТВЕРДЖЕНО. Альтернативний маршрут пройдено.";
-      else if(t.id<4)msg+="\nДоступ до наступного завдання відкрито.";
+      else if(t.id<4)msg+="\nДоступ до наступного завдання відкрито. "+leftText();
       const finishing=t.id===4&&!S.final;
       if(finishing){S.final=true;S.rewards.push({name:"Доступ до фінального сховища",desc:"Усі основні завдання виконано. Час забрати свої знахідки."})}
       save();render();
@@ -345,7 +352,7 @@ function renderOperator(){
   const rows=[["Завдання 01 — PIN",CFG.pin]].concat(CFG.tasks.flatMap(t=>[[pad(t.id)+" самостійне",t.self],[pad(t.id)+" польове",t.field]]));
   return `<section class="card op"><div class="tiny">Режим оператора // не показувати сталкерці</div><h2>Шпаргалка кодів</h2>
   <table>${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</table>
-  <p class="terminal">ПРОГРЕС: ${S.unlocked?"розблоковано":"заблоковано"} · виконано ${[2,3,4].filter(done).length}/3 · бонусів ${Object.keys(S.bonus).length}</p>
+  <p class="terminal">ПРОГРЕС: ${S.unlocked?"розблоковано":"заблоковано"} · виконано ${S.unlocked?[2,3,4].filter(done).length+1:0}/4 · бонусів ${Object.keys(S.bonus).length}</p>
   <div class="row"><button class="btn ghost" id="testSnd">ПЕРЕВІРИТИ ЗВУК</button><button class="btn warn" id="reset">${resetArmed?"ТОЧНО? НАТИСНИ ЩЕ РАЗ":"СКИНУТИ ПРОГРЕС"}</button></div>
   <button class="btn" id="opExit">ВИЙТИ З РЕЖИМУ ОПЕРАТОРА</button></section>`}
 function bindOperator(){
